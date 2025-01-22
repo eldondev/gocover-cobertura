@@ -39,7 +39,7 @@ func TestConvertParseProfilesError(t *testing.T) {
 		err = pipe2wr.Close()
 		require.NoError(t, err)
 	}()
-	err := convert(strings.NewReader("invalid data"), pipe2wr, io.Discard, &Ignore{})
+	err := convert(strings.NewReader("invalid data"), pipe2wr, io.Discard, &Ignore{}, "")
 	require.Error(t, err)
 	require.Equal(t, "bad mode line: invalid data", err.Error())
 }
@@ -49,7 +49,7 @@ func TestConvertOutputError(t *testing.T) {
 	err := pipe2wr.Close()
 	require.NoError(t, err)
 	defer func() { err := pipe2rd.Close(); require.NoError(t, err) }()
-	err = convert(strings.NewReader("mode: set"), pipe2wr, io.Discard, &Ignore{})
+	err = convert(strings.NewReader("mode: set"), pipe2wr, io.Discard, &Ignore{}, "")
 	require.Error(t, err)
 	require.Equal(t, "io: read/write on closed pipe", err.Error())
 }
@@ -59,7 +59,7 @@ func TestConvertEmpty(t *testing.T) {
 
 	pipe2rd, pipe2wr := io.Pipe()
 	go func() {
-		err := convert(strings.NewReader(data), pipe2wr, io.Discard, &Ignore{})
+		err := convert(strings.NewReader(data), pipe2wr, io.Discard, &Ignore{}, "")
 		require.NoError(t, err)
 	}()
 
@@ -103,7 +103,7 @@ func TestParseProfileDoesNotExist(t *testing.T) {
 
 	// Windows vs. Linux
 	if !strings.Contains(err.Error(), "system cannot find the file specified") &&
-		!strings.Contains(err.Error(), "no such file or directory") {
+		!strings.Contains(err.Error(), "unable to determine file path for does-not-exist") {
 		t.Errorf(err.Error())
 	}
 }
@@ -162,7 +162,7 @@ func TestConvertSetMode(t *testing.T) {
 		err := convert(pipe1rd, convwr, io.Discard, &Ignore{
 			GeneratedFiles: true,
 			Files:          regexp.MustCompile(`[\\/]func[45]\.go$`),
-		})
+		}, "")
 		if err != nil {
 			panic(err)
 		}
@@ -178,7 +178,7 @@ func TestConvertSetMode(t *testing.T) {
 	require.Len(t, v.Packages, 1)
 
 	p := v.Packages[0]
-	require.Equal(t, "github.com/boumenot/gocover-cobertura/testdata", strings.TrimRight(p.Name, "/"))
+	require.Equal(t, "github.com/eldondev/gocover-cobertura/testdata", strings.TrimRight(p.Name, "/"))
 	require.NotNil(t, p.Classes)
 	require.Len(t, p.Classes, 2)
 
