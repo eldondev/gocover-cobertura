@@ -77,6 +77,7 @@ func convert(in io.Reader, out, outErr io.Writer, ignore *Ignore, tags string) e
 	sources := make([]*Source, 0)
 	pkgMap := make(map[string]*packages.Package)
 	for _, pkg := range pkgs {
+		fmt.Printf("Package %+v", pkg)
 		sources = appendIfUnique(sources, pkg.Module.Dir)
 		pkgMap[pkg.ID] = pkg
 	}
