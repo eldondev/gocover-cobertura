@@ -103,7 +103,7 @@ func TestParseProfileDoesNotExist(t *testing.T) {
 
 	// Windows vs. Linux
 	if !strings.Contains(err.Error(), "system cannot find the file specified") &&
-		!strings.Contains(err.Error(), "unable to determine file path for does-not-exist")
+		!strings.Contains(err.Error(), "unable to determine file path for does-not-exist") {
 		t.Errorf(err.Error())
 	}
 }
